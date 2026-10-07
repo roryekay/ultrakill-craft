@@ -26,14 +26,14 @@ Manual alternative: copy the contents of `ULTRAKILL/` into the ULTRAKILL game di
 
 - **F7** toggles Minecraft items/native weapons; F8 is the native console.
 - Hotbar bindings follow that Minecraft instance's saved options, including side mouse buttons. Mouse wheel changes slots; F swaps hands; F5 cycles camera perspectives. Movement remains native ULTRAKILL.
-- Sword/empty-hand clicks attempt a 120 ms native parry independently of the sword damage cooldown. Projectile parry detection is slightly wider without changing visuals or damage collision. Native blue/unparryable attacks retain their rules. Eligible enemy melee parries, including Gabriel's, use native punch handling.
+- Sword/empty-hand clicks attempt a 120 ms native parry independently of the sword damage cooldown. Holding left click keeps checking parryable incoming attacks near your aim while a sword/empty hand is selected; release it to stop the assist. The assist expires if Minecraft item state goes stale (250 ms), and does not add automatic sword damage. Projectile parry detection is slightly wider without changing visuals or damage collision. Native blue/unparryable attacks retain their rules. The native white parry flash is carried through the final Minecraft compositor, including hitstop; ULTRAKILL's parry-flash setting is respected. Eligible enemy melee parries, including Gabriel's, use native punch handling.
 - Native damage appears in regular Minecraft hearts. Actual Minecraft healing (regeneration, potions, food healing) restores native HP through its native hard-damage cap. Golden-apple regeneration heals; absorption is not mapped to extra native HP.
 - Creative mode grants invincibility; a raised shield blocks native damage; each armor piece reduces damage 10%, any material, max 40%.
 - Blocks, swords, arrows, crossbows, pearls, TNT and fireworks bridge into native gameplay. Boss bars stay visible. Overlay inventory was removed after an unsuccessful test; use Minecraft's own window to manage equipment.
 
 ## Prototype limits
 
-Campaign combat, hotbar binding transfer, shield/armor protection, rendering, third person and projectile parry fixtures have been tested during development. The latest rapid-click relay, expanded projectile detection and enemy-melee-parry changes compile but have **not completed live validation**; every Gabriel attack is not independently verified. This private upload is a review candidate, not a claim of exhaustive testing.
+Campaign combat, hotbar binding transfer, shield/armor protection, rendering, third person and projectile parry fixtures have been tested during development. The latest rapid-click relay, held-click assist, parry-flash compositor and enemy-melee-parry changes compile; the updated shader has compiled in the running ReShade runtime, but gameplay checks have **not completed live validation**; every Gabriel attack is not independently verified. This private upload is a review candidate, not a claim of exhaustive testing.
 
 Each native scene currently starts Minecraft in creative mode. For a vulnerable fight, switch to the Minecraft window and run `/gamemode survival`, then return to ULTRAKILL. The current bootstrap also restores starter hotbar items whenever Minecraft starts; arrange desired gear after launching. Both games must stay running; performance and input timing depend on both clients.
 

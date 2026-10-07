@@ -20,6 +20,7 @@ uniform float2 HostPlanes = float2(0.15, 10000.0);
 // Set true by the add-on only while it has uploaded a Minecraft frame; until then ULTRAKILL passes through untouched.
 uniform bool McActive = false;
 uniform float4 NativeBossRect = float4(0.0,0.0,0.0,0.0);
+uniform float NativeParryFlash = 0.0;
 
 uniform bool HostReversedZ < ui_label = "ULTRAKILL depth is reversed"; > = true;
 // Unity's resolved depth texture is vertically flipped relative to its swapchain.
@@ -323,6 +324,7 @@ float4 PS_Bright(float4 pos : SV_Position, float2 uv : TEXCOORD) : SV_Target
 /// top (neither shaken nor warped).
 float3 PS_Final(float4 pos : SV_Position, float2 uv : TEXCOORD) : SV_Target
 {
+ if (NativeParryFlash > 0.5) return float3(1.0,1.0,1.0);
  // Native boss UI must remain above the Minecraft composite.
  if (NativeBossRect.z > NativeBossRect.x && all(uv >= NativeBossRect.xy) && all(uv <= NativeBossRect.zw))
   return tex2D(ReShade::BackBuffer, uv).rgb;

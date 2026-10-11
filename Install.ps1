@@ -43,7 +43,16 @@ if ($PSCmdlet.ShouldProcess($configTarget,'Back up config and set isolated Minec
         Copy-Item -LiteralPath $configTarget -Destination (Join-Path $backupTarget 'local.minekill.overlay.cfg')
     }
     New-Item -ItemType Directory -Path (Split-Path $configTarget) -Force | Out-Null
-    @("[Paths]","MinecraftInstanceDirectory = $mcTarget") | Set-Content -LiteralPath $configTarget -Encoding UTF8
+    $config=if (Test-Path -LiteralPath $configTarget) { Get-Content -LiteralPath $configTarget -Raw } else { '' }
+    $section=[regex]::Match($config,'(?ms)^\[Paths\][^\r\n]*\r?\n(?:(?!^\[).)*')
+    if ($section.Success) {
+        $updated=$section.Value
+        if ($updated -match '(?m)^MinecraftInstanceDirectory\s*=') {
+            $updated=[regex]::Replace($updated,'(?m)^MinecraftInstanceDirectory\s*=[^\r\n]*',[Text.RegularExpressions.MatchEvaluator]{ param($match) "MinecraftInstanceDirectory = $mcTarget" })
+        } else { $updated+="`r`nMinecraftInstanceDirectory = $mcTarget`r`n" }
+        $config=$config.Substring(0,$section.Index)+$updated+$config.Substring($section.Index+$section.Length)
+    } else { $config+="`r`n[Paths]`r`nMinecraftInstanceDirectory = $mcTarget`r`n" }
+    [IO.File]::WriteAllText($configTarget,$config,(New-Object Text.UTF8Encoding($false)))
 }
 Write-Output 'Package verified. Installation steps completed (or previewed with -WhatIf). Start your isolated Minecraft profile, then ULTRAKILL.'
 

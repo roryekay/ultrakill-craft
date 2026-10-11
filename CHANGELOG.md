@@ -13,3 +13,9 @@
 - Skip already reflected friendly projectiles during held assist.
 - Sandbox: projectile reflection, off-center reflection, native white flash visibly present and cleared, explicitly unparryable projectile rejected, 12/12 rapid-click relay attempts, Gabriel native melee parry with his eligibility flag enabled and rejection with it disabled. Real mouse clicks reflected Stray projectiles.
 - Full campaign attack coverage and sustained held-input acceptance remain unverified.
+
+## Easy setup — 2026-10-10
+
+- Add Setup.cmd for automatic verified dependency downloads, isolated Minecraft profile and desktop shortcut.
+- Support both Windows launcher profile formats; preserve existing profiles, worlds and unrelated mod configuration.
+- Back up replaced dependency/profile files and document manual installation and review limits.

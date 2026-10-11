@@ -8,19 +8,30 @@ Real Minecraft Java blocks, items, hands and hearts over the real ULTRAKILL camp
 
 - ULTRAKILL for Windows x64, Steam installation. Tested with the locally installed October 2026 build; future patches may break native API hooks.
 - Minecraft Java **26.3**, Java/JDK **25**, [Fabric Loader](https://fabricmc.net/use/installer/) **0.19.5**, [Fabric API](https://modrinth.com/mod/fabric-api) **0.161.0+26.3**.
-- [BepInEx 5 x64](https://github.com/BepInEx/BepInEx/releases) (5.4.x) installed in ULTRAKILL; run the game once and close it.
+- [BepInEx 5 x64](https://github.com/BepInEx/BepInEx/releases) **5.4.23.5** installed in ULTRAKILL; run the game once and close it.
 - [ReShade](https://reshade.me/) **6.8.0**, the build with full add-on support, installed for ULTRAKILL's DirectX 11 renderer. The loader/runtime installers are downloaded separately from their official sources.
 - Enough GPU/RAM for two games at once. Other mod combinations and multiplayer are untested.
 
-## Install
+## Easy setup (Windows x64)
 
-1. Download this repository as ZIP (Code → Download ZIP) and extract it. While private, GitHub access is required. Check `SHA256SUMS.txt` if verifying individual files.
-2. Install the requirements above. Make a separate official Minecraft Launcher installation named **Ultrakill Craft**, using Fabric 26.3 and an empty game directory. The recommended directory is `%LOCALAPPDATA%\UltrakillCraft\minecraft-instance`. Use Java 25 with `--enable-native-access=ALL-UNNAMED -Xms512M -Xmx3G` and a 1280×720 window.
-3. Put the matching Fabric API jar in that Minecraft directory's `mods` folder. Close both games.
-4. Run `Install.ps1` in PowerShell with your actual paths: `./Install.ps1 -GameDir "<ULTRAKILL directory>" -MinecraftDir "<isolated Minecraft game directory>"`. `-WhatIf` previews the copies. The script verifies package hashes, backs up replaced files, copies only this mod, and writes its Minecraft-directory setting. It does not download dependencies, sign in, or change launcher profiles.
-5. Start that Minecraft profile. It opens a dedicated void world automatically. Keep its window open and unminimized. Start ULTRAKILL and select a level. The overlay connects automatically.
+1. Install ULTRAKILL through Steam and the official Minecraft Launcher. Open Minecraft Launcher once, sign in, then close the launcher and both games.
+2. [Download this ZIP](https://github.com/roryekay/ultrakill-craft/archive/refs/heads/main.zip), **extract the whole ZIP**, and double-click **Setup.cmd**. Do not run it from inside the ZIP.
+3. Setup finds ULTRAKILL automatically (or asks for its folder), downloads the pinned dependencies, verifies their hashes, installs the mod, creates an isolated **Ultrakill Craft** Minecraft profile, and adds a desktop shortcut. Allow time for the Java download.
+4. Use the **Ultrakill Craft** desktop shortcut. In Minecraft Launcher select **Ultrakill Craft** and press **Play**. The launcher downloads Minecraft and Fabric libraries on this first launch. Keep Minecraft open and unminimized while ULTRAKILL runs.
 
-Manual alternative: copy the contents of `ULTRAKILL/` into the ULTRAKILL game directory and `Minecraft/mods/` into the isolated Minecraft `mods` folder. Back up existing ReShade settings first. Set `[Paths] MinecraftInstanceDirectory = <isolated game directory>` in `BepInEx/config/local.minekill.overlay.cfg` if you used a different directory. Never add a duplicate Minekill.dll directly under plugins.
+No extra accounts, passwords or paid installer are needed. You must own the games. Authentication and the final Minecraft Play button stay in the official launcher. Setup does not install Steam or the games themselves. Java is private to this mod; your system Java/PATH stays unchanged. Setup.cmd uses PowerShell's process-only execution policy option, without changing Windows' saved policy.
+
+Setup supports standard Steam libraries and both Windows Minecraft Launcher profile formats. It keeps existing profiles/worlds and saves replaced dependency files and launcher profiles under `%LOCALAPPDATA%\UltrakillCraft\backups`. The mod copier also backs up replaced mod/config files under `ULTRAKILL\UltrakillCraft-backups`. Rerunning setup repairs/reinstalls the same pinned versions. Existing ReShade settings and BepInEx loader files are replaced with backups; check compatibility if you already use other mods. Close other Java applications during setup as well.
+
+If the game directory is protected, setup stops before installation. Run Setup.cmd as administrator **using the same Windows account**, or use a writable Steam library. Different administrator credentials would create the profile/shortcut for that account. Download failure or hash mismatch stops installation; retry later instead of skipping verification.
+
+For a preview: `./Setup.ps1 -GameDir "<ULTRAKILL directory>" -WhatIf`. Advanced options include `-MinecraftDir`, `-LauncherDir`, `-SetupDir` and `-NoShortcut`. Download details and hashes are in `Setup.Dependencies.json`; review notes are in [SETUP_REVIEW.md](SETUP_REVIEW.md).
+
+### Manual installation
+
+Install the Requirements above, including Fabric API in an isolated Minecraft game directory. Create an official launcher profile for Fabric 26.3 with Java 25, `--enable-native-access=ALL-UNNAMED -Xms512M -Xmx3G` and a 1280�720 window. Close both games, then run `./Install.ps1 -GameDir "<ULTRAKILL directory>" -MinecraftDir "<isolated Minecraft directory>"`. `-WhatIf` previews the mod copies; Install.ps1 alone does not download dependencies or create profiles.
+
+Alternatively copy `ULTRAKILL/` into the game directory and `Minecraft/mods/` into the isolated Minecraft `mods` folder. Set `[Paths] MinecraftInstanceDirectory = <isolated game directory>` in `BepInEx/config/local.minekill.overlay.cfg`. Never add a duplicate Minekill.dll directly under plugins.
 
 ## Controls and behavior
 
@@ -33,7 +44,7 @@ Manual alternative: copy the contents of `ULTRAKILL/` into the ULTRAKILL game di
 
 ## Prototype limits
 
-Campaign combat, hotbar binding transfer, shield/armor protection, rendering, third person and projectile parry fixtures have been tested during development. Live Sandbox checks confirmed native projectile reflection (including an off-center shot), visible full-screen white flash and its return to gameplay, rejection of an explicitly unparryable projectile, all 12 rapid-click relay attempts, and a native Gabriel melee parry when his parryable flag is active. Real mouse clicks also reflected incoming Stray projectiles. A missing initialized Feedbacker was fixed without changing the saved arm loadout. Held assist skips already reflected friendly shots. Every Gabriel attack and sustained held-click behavior are not independently verified. This private upload is a review candidate, not a claim of exhaustive testing.
+Campaign combat, hotbar binding transfer, shield/armor protection, rendering, third person and projectile parry fixtures have been tested during development. Live Sandbox checks confirmed native projectile reflection (including an off-center shot), visible full-screen white flash and its return to gameplay, rejection of an explicitly unparryable projectile, all 12 rapid-click relay attempts, and a native Gabriel melee parry when his parryable flag is active. Real mouse clicks also reflected incoming Stray projectiles. A missing initialized Feedbacker was fixed without changing the saved arm loadout. Held assist skips already reflected friendly shots. Every Gabriel attack and sustained held-click behavior are not independently verified. This is a prototype, not a claim of exhaustive testing.
 
 Each native scene currently starts Minecraft in creative mode. For a vulnerable fight, switch to the Minecraft window and run `/gamemode survival`, then return to ULTRAKILL. The current bootstrap also restores starter hotbar items whenever Minecraft starts; arrange desired gear after launching. Both games must stay running; performance and input timing depend on both clients.
 

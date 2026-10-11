@@ -1,0 +1,32 @@
+{
+  "Java": {
+    "Url": "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_x64_windows_hotspot_25.0.4.1_1.zip",
+    "Hash": "00c847d804f4a78e9f04f2683faf14fed898535b177b7fc704486cb0284e9283",
+    "Algorithm": "SHA256",
+    "File": "java25.zip"
+  },
+  "BepInEx": {
+    "Url": "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.5/BepInEx_win_x64_5.4.23.5.zip",
+    "Hash": "82f9878551030f54657792c0740d9d51a09500eeae1fba21106b0c441e6732c4",
+    "Algorithm": "SHA256",
+    "File": "bepinex.zip"
+  },
+  "ReShade": {
+    "Url": "https://reshade.me/downloads/ReShade_Setup_6.8.0_Addon.exe",
+    "Hash": "afe4c8f13048306307983b8b3d41d5bf00a86820440b0e57dea10950e1176445",
+    "Algorithm": "SHA256",
+    "File": "reshade.exe"
+  },
+  "Fabric": {
+    "Url": "https://meta.fabricmc.net/v2/versions/loader/26.3/0.19.5/profile/json",
+    "Hash": "d51a2982fa4787b7b5806129aca7425cad980f76993e63f3d6d5106a1274a5cf",
+    "Algorithm": "SHA256",
+    "File": "fabric.json"
+  },
+  "FabricAPI": {
+    "Url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/bNnaTiuM/fabric-api-0.161.0%2B26.3.jar",
+    "Hash": "ed6b2586d6fde11fde8472f5a527c51e99b67026e46f94d4bfd85e7e28ce5ee299173ee16ad576ceb51f39f98d30a811086a6deb1a86a524859cc16e12da109d",
+    "Algorithm": "SHA512",
+    "File": "fabric-api-0.161.0+26.3.jar"
+  }
+}

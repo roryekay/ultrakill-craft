@@ -1,9 +1,9 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$GameDir,
-    [string]$MinecraftDir=(Join-Path $env:LOCALAPPDATA 'UltrakillCraft/minecraft-instance'),
+    [string]$SetupDir=(Join-Path $env:USERPROFILE 'Games/Ultrakill Craft'),
+    [string]$MinecraftDir=(Join-Path $SetupDir 'minecraft-instance'),
     [string]$LauncherDir=(Join-Path $env:APPDATA '.minecraft'),
-    [string]$SetupDir=(Join-Path $env:LOCALAPPDATA 'UltrakillCraft'),
     [switch]$NoShortcut
 )
 $ErrorActionPreference='Stop'
@@ -16,16 +16,24 @@ if (!$GameDir -or !(Test-Path -LiteralPath (Join-Path $GameDir 'ULTRAKILL.exe'))
 $GameDir=[IO.Path]::GetFullPath($GameDir)
 $MinecraftDir=[IO.Path]::GetFullPath($MinecraftDir)
 $SetupDir=[IO.Path]::GetFullPath($SetupDir)
+$LauncherDir=[IO.Path]::GetFullPath($LauncherDir)
+foreach ($directory in @($SetupDir,$MinecraftDir)) {
+    foreach ($appData in @($env:LOCALAPPDATA,$env:APPDATA)) {
+        if ($directory -eq $appData -or $directory.StartsWith($appData.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Choose a Games or Documents folder outside AppData so the Microsoft Store Minecraft Launcher can see Java and the mod files.' }
+    }
+}
 $profileFiles=@('launcher_profiles.json','launcher_profiles_microsoft_store.json' | ForEach-Object { Join-Path $LauncherDir $_ } | Where-Object { Test-Path -LiteralPath $_ })
 if (!$profileFiles.Count) { throw 'Install/open the official Minecraft Launcher, sign in, then close it and run setup again. Get it at https://www.minecraft.net/download. The games must already be installed.' }
 foreach ($profileFile in $profileFiles) {
     $profileData=Get-Content -LiteralPath $profileFile -Raw | ConvertFrom-Json
     if (!$profileData.profiles) { throw 'Open the official Minecraft Launcher once, then close it and retry.' }
+    $existing=$profileData.profiles.'ultrakill-craft'
+    if ($existing.gameDir -and [IO.Path]::GetFullPath($existing.gameDir) -ne $MinecraftDir) { throw "The existing Ultrakill Craft profile uses $($existing.gameDir). To keep its worlds, use -MinecraftDir with that folder outside AppData. If moving an old AppData instance, move the whole instance folder and update its launcher profile gameDir first. No installed files were changed." }
 }
 if (Test-Path -LiteralPath (Join-Path $GameDir 'BepInEx/plugins/Minekill.dll')) { throw 'An older duplicate Minekill.dll exists directly under BepInEx/plugins. Remove or relocate it first.' }
 Write-Host "ULTRAKILL: $GameDir"
 Write-Host "Minecraft profile directory: $MinecraftDir"
-Write-Host 'Setup downloads Java 25, BepInEx 5, full-add-on ReShade 6.8, Fabric and Fabric API.'
+Write-Host 'Setup installs Java 25, BepInEx 5, full-add-on ReShade 6.8, Fabric and Fabric API.'
 Write-Host 'Replaced files and launcher profiles will be backed up. Existing worlds are kept.'
 if (!$PSCmdlet.ShouldProcess($GameDir,'Install dependencies, mod, Minecraft profile and desktop shortcut')) { return }
 if (Get-Process -Name ULTRAKILL,java,javaw,MinecraftLauncher -ErrorAction SilentlyContinue) { throw 'Close ULTRAKILL, Minecraft, its launcher and other Java apps normally before setup, then try again.' }
@@ -62,7 +70,8 @@ foreach ($pair in @(@('java',$javaRoot,'runtime'),@('bepinex',$GameDir,'ULTRAKIL
 }
 Copy-WithBackup (Join-Path $stage 'dxgi.dll') (Join-Path $GameDir 'dxgi.dll') (Join-Path $backup 'ULTRAKILL/dxgi.dll')
 $version='fabric-loader-0.19.5-26.3'
-Copy-WithBackup $files.Fabric (Join-Path $LauncherDir "versions/$version/$version.json") (Join-Path $backup 'Minecraft/fabric-profile.json')
+Copy-WithBackup (Join-Path $PSScriptRoot 'Minecraft/fabric-version.json') (Join-Path $LauncherDir "versions/$version/$version.json") (Join-Path $backup 'Minecraft/fabric-profile.json')
+Copy-WithBackup (Join-Path $PSScriptRoot 'Minecraft/vanilla-version.json') (Join-Path $LauncherDir 'versions/26.3/26.3.json') (Join-Path $backup 'Minecraft/vanilla-profile.json')
 Copy-WithBackup $files.FabricAPI (Join-Path $MinecraftDir 'mods/fabric-api-0.161.0+26.3.jar') (Join-Path $backup 'Minecraft/fabric-api.jar')
 & (Join-Path $PSScriptRoot 'Install.ps1') -GameDir $GameDir -MinecraftDir $MinecraftDir
 foreach ($profileFile in $profileFiles) { Set-CraftProfile $profileFile $MinecraftDir $javaExe (Join-Path $backup ('Minecraft/'+[IO.Path]::GetFileName($profileFile))) }

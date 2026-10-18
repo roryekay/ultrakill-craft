@@ -4,7 +4,10 @@ function Assert-Package([string]$Root) {
         $parts=$line -split '  ',2
         if ($parts.Count -ne 2 -or $parts[0] -notmatch '^[a-fA-F0-9]{64}$') { throw 'Malformed package manifest.' }
         $file=Get-ContainedPath $Root $parts[1]
-        if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $parts[0]) { throw "Package verification failed: $($parts[1])" }
+        # Stream hashing avoids PowerShell 5.1 provider reads being skipped by WhatIf.
+        $stream=[IO.File]::OpenRead($file)
+        try { $hash=(Get-FileHash -InputStream $stream -Algorithm SHA256).Hash } finally { $stream.Dispose() }
+        if ($hash -ne $parts[0]) { throw "Package verification failed: $($parts[1])" }
     }
 }
 function Get-ContainedPath([string]$Root,[string]$Relative) {

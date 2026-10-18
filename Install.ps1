@@ -1,9 +1,10 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [Parameter(Mandatory=$true)][string]$GameDir,
-    [string]$MinecraftDir=(Join-Path $env:LOCALAPPDATA 'UltrakillCraft/minecraft-instance')
+    [string]$MinecraftDir=(Join-Path $env:USERPROFILE 'Games/Ultrakill Craft/minecraft-instance')
 )
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'Setup.Core.ps1')
 $gameTarget=[IO.Path]::GetFullPath($GameDir)
 $mcTarget=[IO.Path]::GetFullPath($MinecraftDir)
 if (!(Test-Path -LiteralPath (Join-Path $gameTarget 'ULTRAKILL.exe'))) { throw 'GameDir must be your ULTRAKILL install.' }
@@ -12,13 +13,7 @@ if (!(Test-Path -LiteralPath (Join-Path $gameTarget 'dxgi.dll'))) { throw 'Insta
 if ((-not $WhatIfPreference) -and (Get-Process ULTRAKILL -ErrorAction SilentlyContinue)) { throw 'Close ULTRAKILL normally before installation. Also close the isolated Minecraft client.' }
 $duplicate=Join-Path $gameTarget 'BepInEx/plugins/Minekill.dll'
 if (Test-Path -LiteralPath $duplicate) { throw 'A duplicate root Minekill.dll exists; remove/relocate it before installing.' }
-foreach ($line in Get-Content -LiteralPath (Join-Path $PSScriptRoot 'SHA256SUMS.txt')) {
-    $parts=$line -split '  ',2
-    if ($parts.Count -ne 2) { throw 'Malformed package hash manifest.' }
-    $source=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot $parts[1]))
-    if (!$source.StartsWith([IO.Path]::GetFullPath($PSScriptRoot)+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid package path.' }
-    if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -ne $parts[0]) { throw "Package verification failed: $($parts[1])" }
-}
+Assert-Package $PSScriptRoot
 $backupTarget=Join-Path $gameTarget ('UltrakillCraft-backups/'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
 function Install-File([string]$source,[string]$destination,[string]$backupName) {
     if ($PSCmdlet.ShouldProcess($destination,'Back up existing file and install Ultrakill Craft')) {
